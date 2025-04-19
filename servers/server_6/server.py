@@ -9,7 +9,7 @@ class DataServer:
         self.server_id = server_id
         self.host = host
         self.port = port + server_id  # Each server has a unique port
-        self.storage_dir = f"server_{server_id}/storage"
+        self.storage_dir = "storage"
         self.ensure_storage_dir()
         
     def ensure_storage_dir(self):
