@@ -12,13 +12,26 @@ from Crypto.Cipher import AES  # type: ignore
 from Crypto.Util.Padding import pad, unpad  # type: ignore
 import reed_solomon
 
-
 METADATA_SERVER_HOST = '127.0.0.1'
 METADATA_SERVER_PORT = 8000
 DATA_SERVER_BASE_PORT = 8100
 NUM_DATA_CHUNKS = 10
 NUM_PARITY_CHUNKS = 4
 TOTAL_SERVERS = NUM_DATA_CHUNKS + NUM_PARITY_CHUNKS
+
+server_ips = [
+    '127.0.0.1', '127.0.0.1', '127.0.0.1', '127.0.0.1',
+    '127.0.0.1', '127.0.0.1', '127.0.0.1', '127.0.0.1',
+    '127.0.0.1', '127.0.0.1', '127.0.0.1', '127.0.0.1',
+    '127.0.0.1', '127.0.0.1'
+]
+
+ports = [
+    8000, 8001, 8002, 8003,
+    8004, 8005, 8006, 8007,
+    8008, 8009, 8010, 8011,
+    8012, 8013
+]
 
 
 def connect_to_metadata_server():
@@ -55,7 +68,7 @@ def get_servers_status():
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(1)
-            s.connect(('127.0.0.1', DATA_SERVER_BASE_PORT + i))
+            s.connect((server_ips[i], ports[i]))
             s.close()
             server_status.append(True)
         except:
@@ -81,7 +94,7 @@ def upload_chunk(server_id, user_id, chunk_id, chunk_data):
     """Upload a chunk to a data server"""
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('127.0.0.1', DATA_SERVER_BASE_PORT + server_id))
+        s.connect((server_ips[server_id], ports[server_id]))
         
         # Send operation type
         s.sendall('U'.encode('utf-8'))
@@ -116,7 +129,7 @@ def download_chunk(server_id, user_id, chunk_id):
     """Download a chunk from a data server"""
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('127.0.0.1', DATA_SERVER_BASE_PORT + server_id))
+        s.connect((server_ips[server_id], ports[server_id]))
         
         # Send operation type
         s.sendall('D'.encode('utf-8'))
@@ -158,7 +171,7 @@ def delete_chunk(server_id, user_id, chunk_id):
     """Delete a chunk from a data server"""
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('127.0.0.1', DATA_SERVER_BASE_PORT + server_id))
+        s.connect((server_ips[server_id], ports[server_id]))
         
         # Send operation type
         s.sendall('X'.encode('utf-8'))
@@ -487,7 +500,9 @@ def download_file(filename, user_id, password):
     
     # Save the file
     try:
-        with open(filename, 'wb') as f:
+        os.makedirs("VaultCLI-downloads", exist_ok=True)
+        file_path = os.path.join("VaultCLI-downloads", filename)
+        with open(file_path, 'wb') as f:
             f.write(reconstructed_data)
         print(f"Successfully downloaded and saved {filename} ({file_size} bytes)")
     except Exception as e:
@@ -572,8 +587,12 @@ def main():
     elif args.command == 'delete':
         delete_file(args.filename, args.user_id, args.password)
     else:
-        parser.print_help()
-
+        print("Commands:")
+        print("python client.py upload <file_path> <user_id> <password>")
+        print("python client.py list <user_id> <password>")
+        print("python client.py download <filename> <user_id> <password>")
+        print("python client.py delete <filename> <user_id> <password>")
+        
 
 if __name__ == "__main__":
     main()
