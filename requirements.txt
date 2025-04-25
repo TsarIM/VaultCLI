@@ -1,0 +1,2 @@
+pycryptodome==3.22.0
+reedsolo==1.7.0

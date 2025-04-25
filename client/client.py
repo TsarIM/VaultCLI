@@ -12,13 +12,6 @@ from Crypto.Cipher import AES  # type: ignore
 from Crypto.Util.Padding import pad, unpad  # type: ignore
 import reed_solomon
 
-METADATA_SERVER_HOST = '127.0.0.1'
-METADATA_SERVER_PORT = 8000
-DATA_SERVER_BASE_PORT = 8100
-NUM_DATA_CHUNKS = 10
-NUM_PARITY_CHUNKS = 4
-TOTAL_SERVERS = NUM_DATA_CHUNKS + NUM_PARITY_CHUNKS
-
 server_ips = [
     '127.0.0.1', '127.0.0.1', '127.0.0.1', '127.0.0.1',
     '127.0.0.1', '127.0.0.1', '127.0.0.1', '127.0.0.1',
@@ -26,12 +19,12 @@ server_ips = [
     '127.0.0.1', '127.0.0.1'
 ]
 
-ports = [
-    8000, 8001, 8002, 8003,
-    8004, 8005, 8006, 8007,
-    8008, 8009, 8010, 8011,
-    8012, 8013
-]
+METADATA_SERVER_HOST = '127.0.0.1'
+METADATA_SERVER_PORT = 8000
+DATA_SERVER_BASE_PORT = 8100
+NUM_DATA_CHUNKS = 10
+NUM_PARITY_CHUNKS = 4
+TOTAL_SERVERS = NUM_DATA_CHUNKS + NUM_PARITY_CHUNKS
 
 
 def connect_to_metadata_server():
@@ -68,7 +61,7 @@ def get_servers_status():
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(1)
-            s.connect((server_ips[i], ports[i]))
+            s.connect((server_ips[i], DATA_SERVER_BASE_PORT + i))
             s.close()
             server_status.append(True)
         except:
@@ -94,7 +87,7 @@ def upload_chunk(server_id, user_id, chunk_id, chunk_data):
     """Upload a chunk to a data server"""
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((server_ips[server_id], ports[server_id]))
+        s.connect((server_ips[server_id], DATA_SERVER_BASE_PORT + server_id))
         
         # Send operation type
         s.sendall('U'.encode('utf-8'))
@@ -129,7 +122,7 @@ def download_chunk(server_id, user_id, chunk_id):
     """Download a chunk from a data server"""
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((server_ips[server_id], ports[server_id]))
+        s.connect((server_ips[server_id], DATA_SERVER_BASE_PORT + server_id))
         
         # Send operation type
         s.sendall('D'.encode('utf-8'))
@@ -171,7 +164,7 @@ def delete_chunk(server_id, user_id, chunk_id):
     """Delete a chunk from a data server"""
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((server_ips[server_id], ports[server_id]))
+        s.connect((server_ips[server_id], DATA_SERVER_BASE_PORT + server_id))
         
         # Send operation type
         s.sendall('X'.encode('utf-8'))
@@ -264,6 +257,18 @@ def upload_file(file_path, user_id, password):  ## marking for changing
         return
     
     filename = os.path.basename(file_path)
+    
+    # Check if file already exists in metadata server
+    check_request = {
+        'action': 'get_file_metadata',
+        'user_id': user_id,
+        'filename': filename
+    }
+    check_response = send_request_to_metadata_server(check_request)
+
+    if check_response.get('status') == 'success':
+        print(f"File '{filename}' already exists on the server. Upload aborted.")
+        return
     
     server_status = get_servers_status()
     available_servers = sum(server_status)
@@ -592,7 +597,7 @@ def main():
         print("python client.py list <user_id> <password>")
         print("python client.py download <filename> <user_id> <password>")
         print("python client.py delete <filename> <user_id> <password>")
-        
+
 
 if __name__ == "__main__":
     main()
