@@ -472,6 +472,7 @@ def download_file(filename, user_id, password):
         reconstructed_data = b''.join(data_chunks)
         
     else:
+        print("please wait! reconstructing file")
         # Need to recover using Reed-Solomon
         rs_codec = reed_solomon.ReedSolomonCodec(NUM_DATA_CHUNKS, NUM_PARITY_CHUNKS)
         try:
@@ -593,6 +594,7 @@ def main():
         delete_file(args.filename, args.user_id, args.password)
     else:
         print("Commands:")
+        print("python client.py register <user_id> <password>")
         print("python client.py upload <file_path> <user_id> <password>")
         print("python client.py list <user_id> <password>")
         print("python client.py download <filename> <user_id> <password>")
