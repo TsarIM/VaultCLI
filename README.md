@@ -2,6 +2,8 @@
 
 A secure, fault-tolerant distributed storage system with encryption, Reed-Solomon error correction, and data redundancy.
 
+[![Watch the Demo video](https://img.youtube.com/vi/oTK8RyDHtxY/0.jpg)](https://youtu.be/oTK8RyDHtxY?si=OL_OxDzNdWOtiivZ)
+
 ## Table of Contents
 - [Overview](#overview)
 - [Features](#features)
