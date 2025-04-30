@@ -201,6 +201,7 @@ The system consists of three main components:
 project_root/
 ├── client/
 │   ├── client.py          # Client application
+|   ├── VaultCLI-downloads/    # Default download location
 │   └── reed_solomon.py    # Reed-Solomon encoding implementation
 ├── metadata_backup/
 │   └── metadata_server.py # backup metadata server implementation
@@ -208,8 +209,8 @@ project_root/
 │   └── metadata_server.py # primary metadata server implementation
 ├── servers/
 │   └── server_1/
-│       └── server.py      # Data server implementation
-├── VaultCLI-downloads/    # Default download location
+│   |   └── server.py      # Data server implementation
+|    
 └── requirements.txt       # Project dependencies
 ```
 
