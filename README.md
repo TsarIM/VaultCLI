@@ -1,7 +1,7 @@
 # VaultCLI - Distributed File Storage Simulation
 
 Simulation of a fault-tolerant distributed storage system with encryption, Reed-Solomon error correction, and data redundancy.
-This Project was created was integrity audit testing purposes.
+This Project was created for integrity audit testing purposes.
 
 Demo Video:
 
